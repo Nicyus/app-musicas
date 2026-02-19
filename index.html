@@ -130,6 +130,11 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
 <header>Músicas</header>
 <div id="contagem"></div>
 
+<!-- BOTÃO DE TOGGLE DE ORDEM -->
+<div style="text-align:center; margin-bottom:10px;">
+  <button id="toggleOrdem" style="background:#00aaff; color:#000; border:none; border-radius:8px; padding:5px 10px; cursor:pointer;">A → Z</button>
+</div>
+
 <div id="menu"></div>
 
 <button id="addMusica">+</button>
@@ -160,6 +165,7 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
 <script>
 let musicas = JSON.parse(localStorage.getItem("musicas")) || [];
 let musicaAtual = null;
+let ordemInvertida = false; // controla o toggle
 
 const menu = document.getElementById("menu");
 const contagem = document.getElementById("contagem");
@@ -173,6 +179,7 @@ const capaMusica = document.getElementById("capaMusica");
 const btnVoltar = document.getElementById("btnVoltar");
 const tamanhoLetra = document.getElementById("tamanhoLetra");
 const btnFoto = document.getElementById("btnFoto");
+const toggleOrdem = document.getElementById("toggleOrdem");
 
 function salvar() {
   localStorage.setItem("musicas", JSON.stringify(musicas));
@@ -182,7 +189,9 @@ function atualizarMenu() {
   menu.innerHTML = "";
   contagem.innerText = musicas.length + " músicas";
 
-  musicas.forEach((m, i) => {
+  let lista = ordemInvertida ? [...musicas].reverse() : musicas;
+
+  lista.forEach((m, i) => {
     const item = document.createElement("div");
     item.className = "musicaItem";
     item.innerHTML = `
@@ -193,9 +202,9 @@ function atualizarMenu() {
           <div class="musicaBanda">${m.banda}</div>
         </div>
       </div>
-      <button class="btnApagar" onclick="event.stopPropagation(); apagar(${i})">X</button>
+      <button class="btnApagar" onclick="event.stopPropagation(); apagar(${musicas.indexOf(m)})">X</button>
     `;
-    item.onclick = () => abrirMusica(i);
+    item.onclick = () => abrirMusica(musicas.indexOf(m));
     menu.appendChild(item);
   });
 }
@@ -220,7 +229,6 @@ function abrirMusica(index) {
   nomeBandaTela.innerText = m.banda;
   letraDiv.innerText = m.letra || "";
 
-  // Aplica o tamanho da letra salvo
   letraDiv.style.fontSize = (m.tamanhoFonte || 18) + "px";
   tamanhoLetra.value = m.tamanhoFonte || 18;
 
@@ -232,7 +240,6 @@ function abrirMusica(index) {
   }
 }
 
-// Ajusta o tamanho da letra quando muda o select
 tamanhoLetra.onchange = () => {
   if(musicaAtual !== null){
     const tamanho = parseInt(tamanhoLetra.value);
@@ -280,6 +287,12 @@ btnAddEditarLetra.onclick = () => {
     salvar();
     abrirMusica(musicaAtual);
   }
+};
+
+// TOGGLE DE ORDEM
+toggleOrdem.onclick = () => {
+  ordemInvertida = !ordemInvertida;
+  atualizarMenu();
 };
 
 atualizarMenu();
