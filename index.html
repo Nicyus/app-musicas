@@ -97,6 +97,19 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   margin-left:5px;
 }
 
+/* BARRA DE PESQUISA */
+#barraPesquisa {
+  width:90%;
+  margin:10px auto;
+  display:block;
+  padding:8px 12px;
+  border-radius:8px;
+  border:2px solid #00aaff33;
+  background:#1c1c1c;
+  color:#fff;
+  font-size:16px;
+}
+
 /* TELA DE MÚSICA */
 #musicaTela { display:none; padding:15px; }
 
@@ -162,6 +175,8 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
 <body>
 
 <header>Músicas</header>
+<input type="text" id="barraPesquisa" placeholder="Pesquisar música ou banda...">
+
 <div id="contagem"></div>
 
 <!-- BOTÕES DE ORDEM E MULTI -->
@@ -205,6 +220,7 @@ const btnFoto = document.getElementById("btnFoto");
 const toggleOrdem = document.getElementById("toggleOrdem");
 const btnFotoMulti = document.getElementById("btnFotoMulti");
 const btnApagarMulti = document.getElementById("btnApagarMulti");
+const barraPesquisa = document.getElementById("barraPesquisa");
 
 function capitalizar(str){
   return str.replace(/\b\w/g, c => c.toUpperCase());
@@ -216,9 +232,18 @@ function salvar() {
 
 function atualizarMenu() {
   menu.innerHTML = "";
+  const pesquisa = barraPesquisa.value.toLowerCase();
   contagem.innerText = musicas.length + " músicas";
 
   let lista = ordemInvertida ? [...musicas].reverse() : musicas;
+
+  // Filtrar músicas pelo início do nome ou banda
+  if (pesquisa.trim() !== "") {
+    lista = lista.filter(m => 
+      m.nome.toLowerCase().startsWith(pesquisa) ||
+      m.banda.toLowerCase().startsWith(pesquisa)
+    );
+  }
 
   lista.forEach((m, i) => {
     const item = document.createElement("div");
@@ -350,6 +375,9 @@ toggleOrdem.onclick = () => {
   ordemInvertida = !ordemInvertida;
   atualizarMenu();
 };
+
+// Pesquisa em tempo real
+barraPesquisa.addEventListener("input", atualizarMenu);
 
 atualizarMenu();
 </script>
