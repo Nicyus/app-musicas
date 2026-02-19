@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>App de Letras</title>
+
+<style>
+body { margin:0; font-family:sans-serif; background:#000; color:#fff; }
+header { text-align:center; padding:15px; font-size:24px; font-weight:bold; color:#00aaff; }
+
+#contagem { text-align:center; margin-bottom:10px; color:#00aaff; }
+
+#menu { padding:10px; }
+
+.musicaItem {
+  background:#0a0a0a;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:8px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  border:1px solid #00aaff33;
+}
+
+.musicaItemContent {
+  display:flex;
+  align-items:center;
+  flex:1;
+}
+
+.menuCapa {
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:8px;
+  margin-right:10px;
+}
+
+.musicaNome { font-weight:bold; color:#00aaff; }
+.musicaBanda { font-size:0.9em; color:#aaa; }
+
+.btnApagar {
+  background:none;
+  border:none;
+  color:#00aaff;
+  font-size:18px;
+  cursor:pointer;
+}
+
+#addMusica {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#00aaff;
+  color:#000;
+  border:none;
+  border-radius:50%;
+  width:60px;
+  height:60px;
+  font-size:30px;
+  cursor:pointer;
+}
+
+#musicaTela { display:none; padding:15px; }
+
+#btnVoltar {
+  background:#00aaff;
+  color:#000;
+  border:none;
+  border-radius:8px;
+  padding:8px 12px;
+  margin-bottom:10px;
+  cursor:pointer;
+}
+
+#nomeMusicaTela { font-size:22px; font-weight:bold; color:#00aaff; }
+#nomeBandaTela { color:#aaa; margin-bottom:15px; }
+
+#capaMusica {
+  width:100%;
+  max-height:200px;
+  object-fit:cover;
+  border-radius:12px;
+  margin-bottom:10px;
+  display:none;
+}
+
+#btnFoto {
+  background:#00aaff;
+  color:#000;
+  border:none;
+  border-radius:8px;
+  padding:8px 12px;
+  margin-bottom:15px;
+  cursor:pointer;
+}
+
+#letra {
+  white-space:pre-wrap;
+  line-height:1.6em;
+}
+
+#btnAddEditarLetra {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#00aaff;
+  color:#000;
+  border:none;
+  border-radius:50%;
+  width:60px;
+  height:60px;
+  font-size:24px;
+  cursor:pointer;
+  display:none;
+}
+
+#tamanhoLetra {
+  margin-bottom:15px;
+  display:none;
+}
+</style>
+</head>
+
+<body>
+
+<header>Músicas</header>
+<div id="contagem"></div>
+
+<div id="menu"></div>
+
+<button id="addMusica">+</button>
+
+<div id="musicaTela">
+
+<button id="btnVoltar">← Menu</button>
+
+<select id="tamanhoLetra">
+<option value="14">Pequena</option>
+<option value="18" selected>Média</option>
+<option value="24">Grande</option>
+<option value="30">Gigante</option>
+</select>
+
+<div id="nomeMusicaTela"></div>
+<div id="nomeBandaTela"></div>
+
+<img id="capaMusica">
+<button id="btnFoto">Adicionar / Trocar Foto</button>
+
+<div id="letra"></div>
+
+</div>
+
+<button id="btnAddEditarLetra">✏️</button>
+
+<script>
+let musicas = JSON.parse(localStorage.getItem("musicas")) || [];
+let musicaAtual = null;
+
+const menu = document.getElementById("menu");
+const contagem = document.getElementById("contagem");
+const addMusica = document.getElementById("addMusica");
+const musicaTela = document.getElementById("musicaTela");
+const nomeMusicaTela = document.getElementById("nomeMusicaTela");
+const nomeBandaTela = document.getElementById("nomeBandaTela");
+const letraDiv = document.getElementById("letra");
+const btnAddEditarLetra = document.getElementById("btnAddEditarLetra");
+const capaMusica = document.getElementById("capaMusica");
+const btnVoltar = document.getElementById("btnVoltar");
+const tamanhoLetra = document.getElementById("tamanhoLetra");
+const btnFoto = document.getElementById("btnFoto");
+
+function salvar() {
+  localStorage.setItem("musicas", JSON.stringify(musicas));
+}
+
+function atualizarMenu() {
+  menu.innerHTML = "";
+  contagem.innerText = musicas.length + " músicas";
+
+  musicas.forEach((m, i) => {
+    const item = document.createElement("div");
+    item.className = "musicaItem";
+    item.innerHTML = `
+      <div class="musicaItemContent">
+        ${m.capa ? `<img src="${m.capa}" class="menuCapa">` : ""}
+        <div>
+          <div class="musicaNome">${m.nome}</div>
+          <div class="musicaBanda">${m.banda}</div>
+        </div>
+      </div>
+      <button class="btnApagar" onclick="event.stopPropagation(); apagar(${i})">X</button>
+    `;
+    item.onclick = () => abrirMusica(i);
+    menu.appendChild(item);
+  });
+}
+
+function apagar(i){
+  musicas.splice(i,1);
+  salvar();
+  atualizarMenu();
+}
+
+function abrirMusica(index) {
+  musicaAtual = index;
+  const m = musicas[index];
+
+  menu.style.display = "none";
+  addMusica.style.display = "none";
+  musicaTela.style.display = "block";
+  btnAddEditarLetra.style.display = "block";
+  tamanhoLetra.style.display = "block";
+
+  nomeMusicaTela.innerText = m.nome;
+  nomeBandaTela.innerText = m.banda;
+  letraDiv.innerText = m.letra || "";
+
+  if (m.capa) {
+    capaMusica.src = m.capa;
+    capaMusica.style.display = "block";
+  } else {
+    capaMusica.style.display = "none";
+  }
+}
+
+btnFoto.onclick = () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+      musicas[musicaAtual].capa = reader.result;
+      salvar();
+      abrirMusica(musicaAtual);
+      atualizarMenu();
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+};
+
+btnVoltar.onclick = () => location.reload();
+
+addMusica.onclick = () => {
+  const nome = prompt("Nome da música:");
+  if (!nome) return;
+  const banda = prompt("Nome da banda:");
+  if (!banda) return;
+  musicas.push({ nome, banda, letra:"", capa:"" });
+  salvar();
+  atualizarMenu();
+};
+
+btnAddEditarLetra.onclick = () => {
+  const texto = prompt("Digite a letra:", musicas[musicaAtual].letra || "");
+  if (texto !== null) {
+    musicas[musicaAtual].letra = texto;
+    salvar();
+    abrirMusica(musicaAtual);
+  }
+};
+
+atualizarMenu();
+</script>
+
+</body>
+</html>
