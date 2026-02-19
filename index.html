@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>App de Letras</title>
-
 <style>
 body { margin:0; font-family:sans-serif; background:#000; color:#fff; }
 header { text-align:center; padding:15px; font-size:24px; font-weight:bold; color:#00aaff; }
@@ -81,7 +80,7 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   border-radius:8px;
   padding:8px 12px;
   cursor:pointer;
-  border:2px solid #ffaa0033;
+  border:2px solid #ffaa0033; /* laranja meio apagado */
   margin-left:5px;
 }
 
@@ -92,8 +91,7 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   border-radius:8px;
   padding:8px 12px;
   cursor:pointer;
-  border:2px solid #ff000033;
-  display:none;
+  border:2px solid #ff000033; /* vermelho meio apagado */
   margin-left:5px;
 }
 
@@ -171,34 +169,28 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
 }
 </style>
 </head>
-
 <body>
-
-<header>Músicas</header>
+<header id="headerTexto">Músicas</header>
 <input type="text" id="barraPesquisa" placeholder="Pesquisar música ou banda...">
-
 <div id="contagem"></div>
-
 <!-- BOTÕES DE ORDEM E MULTI -->
-<div style="text-align:center; margin-bottom:10px;">
+<div id="menuBotoes" style="text-align:center; margin-bottom:10px;">
   <button id="toggleOrdem">A → Z</button>
   <button id="btnFotoMulti">Aplicar capa em várias</button>
   <button id="btnApagarMulti">Apagar selecionadas</button>
 </div>
-
 <div id="menu"></div>
-
 <button id="addMusica">+</button>
 
 <div id="musicaTela">
   <button id="btnVoltar">← Menu</button>
+  <div id="headerLetra" style="text-align:center; font-size:24px; font-weight:bold; color:#00aaff; margin-bottom:10px;">Letra</div>
   <div id="nomeMusicaTela"></div>
   <div id="nomeBandaTela"></div>
   <img id="capaMusica">
   <button id="btnFoto">Adicionar / Trocar Foto</button>
   <div id="letra"></div>
 </div>
-
 <button id="btnAddEditarLetra">✏️</button>
 
 <script>
@@ -221,6 +213,8 @@ const toggleOrdem = document.getElementById("toggleOrdem");
 const btnFotoMulti = document.getElementById("btnFotoMulti");
 const btnApagarMulti = document.getElementById("btnApagarMulti");
 const barraPesquisa = document.getElementById("barraPesquisa");
+const headerTexto = document.getElementById("headerTexto");
+const menuBotoes = document.getElementById("menuBotoes");
 
 function capitalizar(str){
   return str.replace(/\b\w/g, c => c.toUpperCase());
@@ -237,7 +231,6 @@ function atualizarMenu() {
 
   let lista = ordemInvertida ? [...musicas].reverse() : musicas;
 
-  // Filtrar músicas pelo início do nome ou banda
   if (pesquisa.trim() !== "") {
     lista = lista.filter(m => 
       m.nome.toLowerCase().startsWith(pesquisa) ||
@@ -288,13 +281,18 @@ function abrirMusica(index) {
 
   menu.style.display = "none";
   addMusica.style.display = "none";
+  barraPesquisa.style.display = "none";
+  contagem.style.display = "none";
+  headerTexto.style.display = "none";
+  menuBotoes.style.display = "none";
+
   musicaTela.style.display = "block";
   btnAddEditarLetra.style.display = "block";
 
   nomeMusicaTela.innerText = m.nome;
   nomeBandaTela.innerText = m.banda;
   letraDiv.innerText = m.letra || "";
-  letraDiv.style.fontSize = "24px"; // tamanho fixo
+  letraDiv.style.fontSize = "24px";
 
   if (m.capa) {
     capaMusica.src = m.capa;
@@ -376,11 +374,9 @@ toggleOrdem.onclick = () => {
   atualizarMenu();
 };
 
-// Pesquisa em tempo real
 barraPesquisa.addEventListener("input", atualizarMenu);
 
 atualizarMenu();
 </script>
-
 </body>
 </html>
