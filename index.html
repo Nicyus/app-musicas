@@ -46,30 +46,69 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   margin-left:10px;
 }
 
+/* BOTÃO DE ADICIONAR MÚSICA */
 #addMusica {
   position:fixed;
   bottom:20px;
   right:20px;
-  background:#00aaff;
-  color:#000;
+  background:#1c1c1c; /* cinza escuro */
+  color:#fff;
   border:none;
   border-radius:50%;
   width:60px;
   height:60px;
   font-size:30px;
   cursor:pointer;
+  border:2px solid #00aaff33; /* contorno azul leve */
 }
 
+/* BOTÕES DE MULTI E ORDEM */
+#toggleOrdem {
+  background:#1c1c1c; /* cinza escuro */
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  padding:8px 12px;
+  cursor:pointer;
+  border:2px solid #00aaff33; /* contorno azul leve */
+  margin-left:5px;
+}
+
+#btnFotoMulti {
+  background:#1c1c1c;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  padding:8px 12px;
+  cursor:pointer;
+  border:2px solid #ffaa0033; /* contorno laranja leve */
+  margin-left:5px;
+}
+
+#btnApagarMulti {
+  background:#1c1c1c;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  padding:8px 12px;
+  cursor:pointer;
+  border:2px solid #ff000033; /* contorno vermelho leve */
+  display:none; /* só aparece se selecionar algo */
+  margin-left:5px;
+}
+
+/* TELA DE MÚSICA */
 #musicaTela { display:none; padding:15px; }
 
 #btnVoltar {
-  background:#00aaff;
-  color:#000;
+  background:#1c1c1c;
+  color:#fff;
   border:none;
   border-radius:8px;
   padding:8px 12px;
   margin-bottom:10px;
   cursor:pointer;
+  border:2px solid #00aaff33; /* contorno azul leve */
 }
 
 #nomeMusicaTela { font-size:22px; font-weight:bold; color:#00aaff; }
@@ -85,32 +124,17 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
 }
 
 #btnFoto {
-  background:#00aaff;
-  color:#000;
-  border:none;
-  border-radius:8px;
-  padding:8px 12px;
-  margin-bottom:15px;
-  cursor:pointer;
-}
-
-#btnFotoMulti, #btnApagarMulti {
-  background:#ffaa00;
-  color:#000;
-  border:none;
-  border-radius:8px;
-  padding:8px 12px;
-  margin-bottom:15px;
-  cursor:pointer;
-  margin-left:5px;
-}
-
-#btnApagarMulti {
-  background:red;
+  background:#1c1c1c;
   color:#fff;
-  display:none;
+  border:none;
+  border-radius:8px;
+  padding:8px 12px;
+  margin-bottom:15px;
+  cursor:pointer;
+  border:2px solid #00aaff33; /* contorno azul leve */
 }
 
+/* LETRA */
 #letra {
   white-space:pre-wrap;
   line-height:1.6em;
@@ -121,8 +145,8 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   position:fixed;
   bottom:20px;
   right:20px;
-  background:#00aaff;
-  color:#000;
+  background:#1c1c1c;
+  color:#fff;
   border:none;
   border-radius:50%;
   width:60px;
@@ -130,12 +154,11 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   font-size:24px;
   cursor:pointer;
   display:none;
+  border:2px solid #00aaff33; /* contorno azul leve */
 }
 
-#tamanhoLetra {
-  margin-bottom:15px;
-  display:none;
-}
+#tamanhoLetra { margin-bottom:15px; display:none; }
+
 </style>
 </head>
 
@@ -146,7 +169,7 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
 
 <!-- BOTÕES DE ORDEM E MULTI -->
 <div style="text-align:center; margin-bottom:10px;">
-  <button id="toggleOrdem" style="background:#00aaff; color:#000; border:none; border-radius:8px; padding:5px 10px; cursor:pointer;">A → Z</button>
+  <button id="toggleOrdem">A → Z</button>
   <button id="btnFotoMulti">Aplicar capa em várias</button>
   <button id="btnApagarMulti">Apagar selecionadas</button>
 </div>
@@ -181,7 +204,7 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
 <script>
 let musicas = JSON.parse(localStorage.getItem("musicas")) || [];
 let musicaAtual = null;
-let ordemInvertida = false; // controla o toggle
+let ordemInvertida = false;
 
 const menu = document.getElementById("menu");
 const contagem = document.getElementById("contagem");
@@ -199,7 +222,6 @@ const toggleOrdem = document.getElementById("toggleOrdem");
 const btnFotoMulti = document.getElementById("btnFotoMulti");
 const btnApagarMulti = document.getElementById("btnApagarMulti");
 
-// CAPITALIZA PRIMEIRAS LETRAS
 function capitalizar(str){
   return str.replace(/\b\w/g, c => c.toUpperCase());
 }
@@ -233,7 +255,6 @@ function atualizarMenu() {
     menu.appendChild(item);
   });
 
-  // Mostrar X vermelho só se alguma música selecionada
   const checkboxes = document.querySelectorAll(".selecionarCheckbox");
   btnApagarMulti.style.display = Array.from(checkboxes).some(chk => chk.checked) ? "inline-block" : "none";
 
@@ -246,7 +267,7 @@ function atualizarMenu() {
 
 function apagarSelecionadas(){
   const checkboxes = document.querySelectorAll(".selecionarCheckbox:checked");
-  const indices = Array.from(checkboxes).map(chk => parseInt(chk.dataset.index)).sort((a,b)=>b-a); // de trás pra frente
+  const indices = Array.from(checkboxes).map(chk => parseInt(chk.dataset.index)).sort((a,b)=>b-a);
   indices.forEach(i => musicas.splice(i,1));
   salvar();
   atualizarMenu();
@@ -266,7 +287,7 @@ function abrirMusica(index) {
   nomeBandaTela.innerText = m.banda;
   letraDiv.innerText = m.letra || "";
 
-  letraDiv.style.fontSize = "24px"; // FIXO GRANDE
+  letraDiv.style.fontSize = "24px";
   tamanhoLetra.value = 24;
 
   if (m.capa) {
@@ -329,11 +350,10 @@ addMusica.onclick = () => {
   let banda = prompt("Nome da banda:");
   if (!banda) return;
 
-  // CAPITALIZA PRIMEIRAS LETRAS
   nome = capitalizar(nome);
   banda = capitalizar(banda);
 
-  musicas.push({ nome, banda, letra:"", capa:"", tamanhoFonte:24 }); // PADRÃO GRANDE FIXO
+  musicas.push({ nome, banda, letra:"", capa:"", tamanhoFonte:24 });
   salvar();
   atualizarMenu();
 };
@@ -347,7 +367,6 @@ btnAddEditarLetra.onclick = () => {
   }
 };
 
-// TOGGLE DE ORDEM
 toggleOrdem.onclick = () => {
   ordemInvertida = !ordemInvertida;
   atualizarMenu();
