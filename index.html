@@ -51,7 +51,7 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   position:fixed;
   bottom:20px;
   right:20px;
-  background:#1c1c1c; /* cinza escuro */
+  background:#1c1c1c;
   color:#fff;
   border:none;
   border-radius:50%;
@@ -59,18 +59,18 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   height:60px;
   font-size:30px;
   cursor:pointer;
-  border:2px solid #00aaff33; /* contorno azul leve */
+  border:2px solid #00aaff33;
 }
 
 /* BOTÕES DE MULTI E ORDEM */
 #toggleOrdem {
-  background:#1c1c1c; /* cinza escuro */
+  background:#1c1c1c;
   color:#fff;
   border:none;
   border-radius:8px;
   padding:8px 12px;
   cursor:pointer;
-  border:2px solid #00aaff33; /* contorno azul leve */
+  border:2px solid #00aaff33;
   margin-left:5px;
 }
 
@@ -81,7 +81,7 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   border-radius:8px;
   padding:8px 12px;
   cursor:pointer;
-  border:2px solid #ffaa0033; /* contorno laranja leve */
+  border:2px solid #ffaa0033;
   margin-left:5px;
 }
 
@@ -92,8 +92,8 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   border-radius:8px;
   padding:8px 12px;
   cursor:pointer;
-  border:2px solid #ff000033; /* contorno vermelho leve */
-  display:none; /* só aparece se selecionar algo */
+  border:2px solid #ff000033;
+  display:none;
   margin-left:5px;
 }
 
@@ -108,7 +108,7 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   padding:8px 12px;
   margin-bottom:10px;
   cursor:pointer;
-  border:2px solid #00aaff33; /* contorno azul leve */
+  border:2px solid #00aaff33;
 }
 
 #nomeMusicaTela { font-size:22px; font-weight:bold; color:#00aaff; }
@@ -131,14 +131,14 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   padding:8px 12px;
   margin-bottom:15px;
   cursor:pointer;
-  border:2px solid #00aaff33; /* contorno azul leve */
+  border:2px solid #00aaff33;
 }
 
 /* LETRA */
 #letra {
   white-space:pre-wrap;
   line-height:1.6em;
-  font-size:24px; /* PADRÃO GRANDE FIXO */
+  font-size:24px; /* PADRÃO FIXO */
 }
 
 #btnAddEditarLetra {
@@ -154,11 +154,8 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
   font-size:24px;
   cursor:pointer;
   display:none;
-  border:2px solid #00aaff33; /* contorno azul leve */
+  border:2px solid #00aaff33;
 }
-
-#tamanhoLetra { margin-bottom:15px; display:none; }
-
 </style>
 </head>
 
@@ -179,24 +176,12 @@ header { text-align:center; padding:15px; font-size:24px; font-weight:bold; colo
 <button id="addMusica">+</button>
 
 <div id="musicaTela">
-
-<button id="btnVoltar">← Menu</button>
-
-<select id="tamanhoLetra">
-<option value="14">Pequena</option>
-<option value="18">Média</option>
-<option value="24" selected>Grande</option>
-<option value="30">Gigante</option>
-</select>
-
-<div id="nomeMusicaTela"></div>
-<div id="nomeBandaTela"></div>
-
-<img id="capaMusica">
-<button id="btnFoto">Adicionar / Trocar Foto</button>
-
-<div id="letra"></div>
-
+  <button id="btnVoltar">← Menu</button>
+  <div id="nomeMusicaTela"></div>
+  <div id="nomeBandaTela"></div>
+  <img id="capaMusica">
+  <button id="btnFoto">Adicionar / Trocar Foto</button>
+  <div id="letra"></div>
 </div>
 
 <button id="btnAddEditarLetra">✏️</button>
@@ -216,7 +201,6 @@ const letraDiv = document.getElementById("letra");
 const btnAddEditarLetra = document.getElementById("btnAddEditarLetra");
 const capaMusica = document.getElementById("capaMusica");
 const btnVoltar = document.getElementById("btnVoltar");
-const tamanhoLetra = document.getElementById("tamanhoLetra");
 const btnFoto = document.getElementById("btnFoto");
 const toggleOrdem = document.getElementById("toggleOrdem");
 const btnFotoMulti = document.getElementById("btnFotoMulti");
@@ -281,14 +265,11 @@ function abrirMusica(index) {
   addMusica.style.display = "none";
   musicaTela.style.display = "block";
   btnAddEditarLetra.style.display = "block";
-  tamanhoLetra.style.display = "block";
 
   nomeMusicaTela.innerText = m.nome;
   nomeBandaTela.innerText = m.banda;
   letraDiv.innerText = m.letra || "";
-
-  letraDiv.style.fontSize = "24px";
-  tamanhoLetra.value = 24;
+  letraDiv.style.fontSize = "24px"; // tamanho fixo
 
   if (m.capa) {
     capaMusica.src = m.capa;
@@ -302,7 +283,6 @@ btnFoto.onclick = () => {
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "image/*";
-
   input.onchange = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -320,7 +300,6 @@ btnFoto.onclick = () => {
 btnFotoMulti.onclick = () => {
   const checkboxes = document.querySelectorAll(".selecionarCheckbox:checked");
   if(checkboxes.length === 0) { alert("Selecione ao menos uma música."); return; }
-
   const input = document.createElement("input");
   input.type = "file";
   input.accept = "image/*";
