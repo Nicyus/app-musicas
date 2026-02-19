@@ -220,6 +220,10 @@ function abrirMusica(index) {
   nomeBandaTela.innerText = m.banda;
   letraDiv.innerText = m.letra || "";
 
+  // Aplica o tamanho da letra salvo
+  letraDiv.style.fontSize = (m.tamanhoFonte || 18) + "px";
+  tamanhoLetra.value = m.tamanhoFonte || 18;
+
   if (m.capa) {
     capaMusica.src = m.capa;
     capaMusica.style.display = "block";
@@ -227,6 +231,16 @@ function abrirMusica(index) {
     capaMusica.style.display = "none";
   }
 }
+
+// Ajusta o tamanho da letra quando muda o select
+tamanhoLetra.onchange = () => {
+  if(musicaAtual !== null){
+    const tamanho = parseInt(tamanhoLetra.value);
+    letraDiv.style.fontSize = tamanho + "px";
+    musicas[musicaAtual].tamanhoFonte = tamanho;
+    salvar();
+  }
+};
 
 btnFoto.onclick = () => {
   const input = document.createElement("input");
@@ -254,7 +268,7 @@ addMusica.onclick = () => {
   if (!nome) return;
   const banda = prompt("Nome da banda:");
   if (!banda) return;
-  musicas.push({ nome, banda, letra:"", capa:"" });
+  musicas.push({ nome, banda, letra:"", capa:"", tamanhoFonte:18 });
   salvar();
   atualizarMenu();
 };
