@@ -181,6 +181,11 @@ const tamanhoLetra = document.getElementById("tamanhoLetra");
 const btnFoto = document.getElementById("btnFoto");
 const toggleOrdem = document.getElementById("toggleOrdem");
 
+// Função pra deixar primeiras letras maiúsculas
+function capitalizar(str){
+  return str.replace(/\b\w/g, c => c.toUpperCase());
+}
+
 function salvar() {
   localStorage.setItem("musicas", JSON.stringify(musicas));
 }
@@ -271,10 +276,15 @@ btnFoto.onclick = () => {
 btnVoltar.onclick = () => location.reload();
 
 addMusica.onclick = () => {
-  const nome = prompt("Nome da música:");
+  let nome = prompt("Nome da música:");
   if (!nome) return;
-  const banda = prompt("Nome da banda:");
+  let banda = prompt("Nome da banda:");
   if (!banda) return;
+
+  // CAPITALIZA PRIMEIRAS LETRAS
+  nome = capitalizar(nome);
+  banda = capitalizar(banda);
+
   musicas.push({ nome, banda, letra:"", capa:"", tamanhoFonte:18 });
   salvar();
   atualizarMenu();
