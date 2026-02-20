@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultra Music</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,sans-serif;
+  background:#000;
+  color:#fff;
+}
+header{
+  text-align:center;
+  padding:20px;
+  font-size:26px;
+  font-weight:bold;
+  color:#00e0ff;
+  letter-spacing:1px;
+}
+#search{
+  width:90%;
+  margin:0 auto 15px auto;
+  display:block;
+  padding:10px 15px;
+  border-radius:12px;
+  border:2px solid #00e0ff33;
+  background:#111;
+  color:#fff;
+  font-size:16px;
+}
+#controls{text-align:center;margin-bottom:10px}
+button{
+  background:#111;
+  color:#fff;
+  border-radius:10px;
+  padding:8px 14px;
+  cursor:pointer;
+  border:2px solid #00e0ff33;
+  margin:4px;
+  transition:.2s;
+}
+button:hover{transform:scale(1.05);}
+#btnDelete{border-color:#ff000033;}
+#btnDelete:hover{border-color:#ff000066;}
+#btnCover{border-color:#ffaa0033;}
+#btnCover:hover{border-color:#ffaa0066;}
+#btnOrder{border-color:#00e0ff33;}
+#btnOrder:hover{border-color:#00e0ff66;}
+#selectAllBtn{
+  display:none;
+  margin:0 auto 10px auto;
+  padding:6px 12px;
+  border-radius:8px;
+  border:2px solid #33ff0033;
+  color:#fff;
+  background:#111;
+  cursor:pointer;
+  font-weight:bold;
+  transition:.2s;
+}
+#selectAllBtn:hover{border-color:#33ff0066;}
+#addInteligente{
+  position:fixed;
+  bottom:90px;
+  right:20px;
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  font-size:24px;
+  border:2px solid #33ff0033;
+  color:#33ff00;
+  background:#111;
+  cursor:pointer;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.2s;
+}
+#addInteligente:hover{
+  transform:scale(1.05);
+  border-color:#33ff0066;
+}
+#count{text-align:center;color:#00e0ff;margin-bottom:10px;}
+#menu{
+  max-height:calc(100vh - 230px);
+  overflow-y:auto;
+  padding-bottom:150px;
+}
+.song{
+  background:#0f0f0f;
+  margin:10px;
+  padding:12px;
+  border-radius:15px;
+  border:1px solid #00e0ff22;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  transition:.2s;
+}
+.song:hover{background:#151515;transform:scale(1.02);}
+.song-info{display:flex;align-items:center;flex:1;cursor:pointer;}
+.song img{width:55px;height:55px;object-fit:cover;border-radius:12px;margin-right:10px;}
+.song-title{color:#00e0ff;font-weight:bold}
+.song-artist{color:#aaa;font-size:.9em}
+.selectBox{
+  appearance:none;
+  width:18px;
+  height:18px;
+  border:2px solid #00e0ff;
+  border-radius:4px;
+  background:transparent;
+  cursor:pointer;
+  transition:.2s;
+}
+.selectBox:checked{background:#00e0ff;}
+#add{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  font-size:28px;
+  z-index:10;
+}
+#view{display:none;padding:15px}
+#view h2{color:#00e0ff;margin-bottom:5px}
+#view h3{color:#aaa;margin-bottom:15px}
+#lyrics{white-space:pre-wrap;font-size:26px;line-height:1.8em;}
+#back{margin-bottom:15px}
+
+/* painel bandas discreto */
+#bandPanel{
+  display:none;
+  position:fixed;
+  top:70px;
+  left:50%;
+  transform:translateX(-50%);
+  width:80%;
+  max-width:350px;
+  max-height:50%;
+  background:#111;
+  border:1px solid #00e0ff33;
+  border-radius:10px;
+  padding:10px;
+  overflow-y:auto;
+  z-index:20;
+  font-size:14px;
+}
+#bandPanel h3{
+  margin-top:0;
+  color:#00e0ff;
+  margin-bottom:8px;
+  font-size:16px;
+}
+.bandItem{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:4px;
+  padding:4px;
+  border-bottom:1px solid #00e0ff22;
+}
+#btnBandas{
+  font-size:14px;
+  padding:6px 10px;
+  border-radius:6px;
+  border:2px solid #00e0ff33;
+  background:#111;
+  color:#fff;
+  cursor:pointer;
+  margin-left:4px;
+}
+#btnBandas:hover{border-color:#00e0ff66;}
+</style>
+</head>
+
+<body>
+
+<header>Ultra Music</header>
+
+<input id="search" placeholder="Pesquisar música ou banda...">
+
+<div id="controls">
+  <button id="btnOrder" onclick="toggleOrder()">A → Z</button>
+  <button id="btnCover" onclick="applyCoverSelected()">Adicionar capa</button>
+  <button id="btnDelete" onclick="deleteSelected()">Apagar</button>
+  <button id="btnBandas" onclick="toggleBandPanel()">Bandas</button>
+</div>
+
+<button id="selectAllBtn" onclick="toggleSelectAll()">All</button>
+
+<div id="count"></div>
+<div id="menu"></div>
+
+<button id="addInteligente" onclick="adicionarInteligente()">+</button>
+<button id="add" onclick="addSong()">+</button>
+
+<div id="bandPanel">
+  <h3>Bandas e músicas</h3>
+  <div id="bandList"></div>
+  <div id="bandTotal" style="margin-top:8px;font-weight:bold;color:#00e0ff;"></div>
+</div>
+
+<div id="view">
+  <button id="back" onclick="goBack()">← Menu</button>
+  <h2 id="viewTitle"></h2>
+  <h3 id="viewArtist"></h3>
+  <img id="viewCover" style="width:100%;max-height:220px;object-fit:cover;border-radius:15px;margin-bottom:15px;display:none;">
+  <div id="lyrics"></div>
+  <button onclick="editLyrics()" style="position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%">✏️</button>
+</div>
+
+<script>
+let songs = JSON.parse(localStorage.getItem("ultraMusic")) || [];
+let current = null;
+let reverse = false;
+
+function save(){ localStorage.setItem("ultraMusic",JSON.stringify(songs)) }
+
+function render(){
+  const menu=document.getElementById("menu");
+  const search=document.getElementById("search").value.toLowerCase();
+  menu.innerHTML="";
+  let list=reverse?[...songs].reverse():songs;
+
+  if(search.trim()!==""){
+    list=list.filter(s=>s.name.toLowerCase().includes(search)||s.artist.toLowerCase().includes(search));
+  }
+
+  document.getElementById("count").innerText=songs.length+" músicas";
+
+  list.forEach((s)=>{
+    const index=songs.indexOf(s);
+    const div=document.createElement("div");
+    div.className="song";
+    div.innerHTML=`
+      <div class="song-info" onclick="openSong(${index})">
+        ${s.cover?`<img src="${s.cover}">`:""}
+        <div>
+          <div class="song-title">${s.name}</div>
+          <div class="song-artist">${s.artist}</div>
+        </div>
+      </div>
+      <div>
+        <input type="checkbox" class="selectBox" value="${index}" onchange="checkSelected()">
+      </div>
+    `;
+    menu.appendChild(div);
+  });
+
+  checkSelected();
+}
+
+function addSong(){
+  const name=prompt("Nome da música:");
+  if(!name)return;
+  const artist=prompt("Nome da banda:");
+  if(!artist)return;
+  songs.push({name,artist,lyrics:"",cover:""});
+  save();render();
+}
+
+function adicionarInteligente(){
+  const input=prompt("Cole as músicas no formato:\nNome da Música – Nome da Banda\nUma por linha:");
+  if(!input)return;
+  const linhas=input.split("\n");
+  linhas.forEach(l=>{
+    const partes=l.split("–");
+    if(partes.length===2){
+      const name=partes[0].trim();
+      const artist=partes[1].trim();
+      if(name && artist) songs.push({name,artist,lyrics:"",cover:""});
+    }
+  });
+  save();render();
+  alert("Músicas adicionadas!");
+}
+
+function openSong(i){
+  current=i;
+  const s=songs[i];
+  document.getElementById("menu").style.display="none";
+  document.getElementById("view").style.display="block";
+  document.getElementById("search").style.display="none";
+  document.getElementById("controls").style.display="none";
+  document.getElementById("count").style.display="none";
+  document.getElementById("add").style.display="none";
+  document.getElementById("addInteligente").style.display="none";
+  document.getElementById("selectAllBtn").style.display="none";
+  document.getElementById("bandPanel").style.display="none";
+
+  document.getElementById("viewTitle").innerText=s.name;
+  document.getElementById("viewArtist").innerText=s.artist;
+  document.getElementById("lyrics").innerText=s.lyrics||"Sem letra ainda...";
+  const img=document.getElementById("viewCover");
+  if(s.cover){img.src=s.cover;img.style.display="block"}else{img.style.display="none"}
+}
+
+function goBack(){ location.reload() }
+
+function editLyrics(){
+  const text=prompt("Editar letra:",songs[current].lyrics||"");
+  if(text!==null){songs[current].lyrics=text;save();openSong(current)}
+}
+
+function deleteSelected(){
+  const selected=document.querySelectorAll(".selectBox:checked");
+  if(selected.length===0)return alert("Selecione ao menos uma música");
+  const indices=Array.from(selected).map(c=>parseInt(c.value)).sort((a,b)=>b-a);
+  indices.forEach(i=>songs.splice(i,1));
+  save();render();
+}
+
+function applyCoverSelected(){
+  const selected=document.querySelectorAll(".selectBox:checked");
+  if(selected.length===0)return alert("Selecione ao menos uma música");
+  const input=document.createElement("input");
+  input.type="file";
+  input.accept="image/*";
+  input.onchange=e=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      selected.forEach(chk=>{
+        songs[parseInt(chk.value)].cover=reader.result;
+      });
+      save();render();
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  };
+  input.click();
+}
+
+function toggleSelectAll(){
+  const checkboxes = document.querySelectorAll(".selectBox");
+  const allChecked = Array.from(checkboxes).every(cb=>cb.checked);
+  checkboxes.forEach(cb=>cb.checked = !allChecked);
+  checkSelected();
+}
+
+function checkSelected(){
+  const selected=document.querySelectorAll(".selectBox:checked");
+  document.getElementById("selectAllBtn").style.display = selected.length>0 ? "block" : "none";
+}
+
+function toggleOrder(){ reverse=!reverse; render() }
+
+document.getElementById("search").addEventListener("input",render);
+render();
+
+/* painel bandas */
+function toggleBandPanel(){
+  const panel = document.getElementById("bandPanel");
+  if(panel.style.display==="block"){ panel.style.display="none"; return; }
+  const bandList = document.getElementById("bandList");
+  bandList.innerHTML="";
+  const bands={};
+  let total=0;
+  songs.forEach(s=>{
+    if(bands[s.artist]) bands[s.artist]++;
+    else bands[s.artist]=1;
+    total++;
+  });
+  for(let b in bands){
+    const div=document.createElement("div");
+    div.className="bandItem";
+    div.innerHTML=`<span>${b}</span><span>${bands[b]} músicas</span>`;
+    bandList.appendChild(div);
+  }
+  document.getElementById("bandTotal").innerText="Total de músicas: "+total;
+  panel.style.display="block";
+}
+
+// fecha painel ao clicar fora
+document.addEventListener('click', function(event){
+  const panel = document.getElementById("bandPanel");
+  const btn = document.getElementById("btnBandas");
+  if(panel.style.display==="block" && !panel.contains(event.target) && event.target!==btn){
+    panel.style.display="none";
+  }
+});
+</script>
+
+</body>
+</html>
